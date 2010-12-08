@@ -4,7 +4,7 @@
 ## Overview
 Fuzzy c-means (FCM) is a method of clustering which allows one piece of data 
 to belong to two or more clusters, rather than belonging completely to one cluster. 
-Points on the edge of a cluster, may be in the cluster to a lesser degree than points 
+Points on the edge of a cluster may be in the cluster to a lesser degree than points 
 in the center of cluster.
 
 Here is an implementation in clojure.
