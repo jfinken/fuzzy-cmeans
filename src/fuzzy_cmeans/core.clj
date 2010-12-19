@@ -50,8 +50,7 @@
 (def clusters (ref []))
 (def U (ref []))
 (def fuzzy (ref -1))
-;(def eps (Math/pow 10 -5)) ; algorithm precision
-(def eps 0.0001)
+(def eps (ref (Math/pow 10 -9))) ; default algorithm precision
 
 ; accessor routines, an iterface
 (defn get-data-points
@@ -85,7 +84,7 @@
         (Math/sqrt (+ (Math/pow (- (coords-at cp1 0) (coords-at cp2 0)) 2)
                       (Math/pow (- (coords-at cp1 1) (coords-at cp2 1)) 2)))]
     (if (zero? diff)
-      eps
+      @eps
       diff)))
        
 (defn init-U-matrix-1
@@ -142,15 +141,16 @@
 
 (defn init-cmeans
   "Init the algorithm with a list of cluster-points, a list of cluster-points
-  representing the initial number of clusters and their centroids, and an initial
-  fuzzy value.
+  representing the initial number of clusters and their centroids, an initial
+  fuzzy value, and an accuracy value (i.e. (Math/pow 10 -9))
   
   A large fuzzy value results in smaller memberships Uij and hence fuzzier clusters"
-  [in-points in-clusters in-fuzzy]
+  [in-points in-clusters in-fuzzy, in-eps]
   ; stash
   (dosync (ref-set data-points in-points))
   (dosync (ref-set clusters in-clusters))
   (dosync (ref-set fuzzy in-fuzzy))
+  (dosync (ref-set eps in-eps))
   
   ; loop over the points and clusters to create the initial U matrix
   (doseq [i (range (count @data-points))]
@@ -240,10 +240,10 @@
   (doseq [c (range (count @clusters))]
     (doseq [h (range (count @data-points))]
       (let [t1 (euler-distance (@data-points h) (@clusters c))]
-        (let [top (if (> t1 1.0) t1 eps) sumTerms (ref 0.0)]
+        (let [top (if (> t1 1.0) t1 @eps) sumTerms (ref 0.0)]
           (doseq [ck (range (count @clusters))]
             (let [dist1 (euler-distance (@data-points h) (@clusters ck))]
-              (let [dist (if (> dist1 1.0) dist1 eps)]
+              (let [dist (if (> dist1 1.0) dist1 @eps)]
                 ; mutate sumTerms, as in sumTerms += blah
                 (dosync (ref-set sumTerms (+ @sumTerms
                                              (Math/pow (/ top dist) (/ 2 (- @fuzzy 1)))))))))
@@ -257,20 +257,34 @@
 ;------------------------------------------------------------------------------
 ; Run!
 ;------------------------------------------------------------------------------
-(defn run
-  "Perform a complete run of fuzzy-cmeans until the desired accuracy is
-  achieved."
-  []
-  (doseq [i (range 5)]
+(defn run-iter
+  "Perform n complete iterations of fuzzy-cmeans."
+  [num-iters]
+  (doseq [i (range num-iters)]
     (let [j (calculate-objective-function)]
       (calculate-cluster-centers)
       (update)
       (let [jnext (calculate-objective-function)]
         (println "iter" i "of fuzzy-cmeans! (j - jnext):" (Math/abs (- j jnext)))))))
 
-
+(defn run
+  "Perform a complete run of fuzzy-cmeans until the desired accuracy is
+  achieved."
+  []
+  (loop [iter 0 accur 1000]
+    (if (< accur @eps)
+      accur
+      (recur 
+        (inc iter)
+        (do 
+          (println "iteration" iter "of fuzzy cmeans...")
+          (let [j (calculate-objective-function)]
+            (calculate-cluster-centers)
+            (update)
+            (let [jnext (calculate-objective-function)]
+              (Math/abs (- j jnext)))))))))
 ;------------------------------------------------------------------------------
-; Client and debug code
+; Debug code
 ;------------------------------------------------------------------------------
 (defn print-points
   []

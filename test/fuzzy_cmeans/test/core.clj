@@ -4,11 +4,11 @@
     (:use [incanter core stats charts])
     (:use [clojure.test]))
 
-(deftest replace-me ;; FIXME: write
-  (is false "No tests have been written."))
+;(deftest replace-me ;; FIXME: write
+;  (is false "No tests have been written."))
 
 ;------------------------------------------------------------------------------
-; code to read a CSV of data points - unused at this point
+; code to read a CSV of data points - currently unused
 ;------------------------------------------------------------------------------
 (defn read-points-file
   [path]
@@ -62,23 +62,23 @@
                    ( + (mod (rand Integer/MAX_VALUE) (inc (- ymax ymin))) ymin));y
                  -1))))))
 
-(def in-fuzzy 2.0)
-(def xmin 1)
-(def xmax 500)
-(def ymin 1)
-(def ymax 500)
-(def num-clusters 5)
-(def pts (gen-cluster-points 1000 xmin xmax ymin ymax))
-;(def pts (get-test-data-points))
-(def centroids (gen-cluster-points num-clusters xmin xmax ymin ymax))
-;(def centroids (get-test-clusters))
-; init!
-(fuzzy/init-cmeans pts centroids in-fuzzy)
-;(print-points)
-(fuzzy/print-clusters)
-; iterate
-(fuzzy/run)
-
+(defn main
+  []
+  (let [in-fuzzy 2.0
+        eps (Math/pow 10 -10) 
+        xmin 1 xmax 500
+        ymin 1 ymax 500
+        num-clusters 5
+        num-points 1000]
+    (let [data-pts (gen-cluster-points num-points xmin xmax ymin ymax)
+          centroids (gen-cluster-points num-clusters xmin xmax ymin ymax)]
+      ; init fuzzy-cmeans
+      (fuzzy/init-cmeans data-pts centroids in-fuzzy eps)
+      ; print clusters just for fun..
+      (fuzzy/print-clusters)
+      ; run 
+      (fuzzy/run)
+      )))
 ;------------------------------------------------------------------------------
 ; Visualize with Incanter 
 ;------------------------------------------------------------------------------
@@ -133,4 +133,8 @@
                         (add-points center_xs center_ys))]
         (view plot)))))
 
+; generate points and run fuzzy cmeans
+(main)
+; visualize
+(incanter-vis)
 
