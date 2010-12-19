@@ -13,8 +13,8 @@ Here is an implementation in clojure.
 
 This implementation requires initialization with the data points to be sorted, 
 the initial cluster centroids, and fuzzy and accuracy values.  The fuzzy parameter, a
-minimum of 2.0, affects the degree to which the data points are members of the clusters.  
-A large fuzzy value technically results in smaller membership values and hence fuzzier
+minimum of 2.0, affects the degree to which the data points are members of the clusters.  A 
+large fuzzy value technically results in smaller membership values and hence fuzzier 
 clusters.
 
 The fuzzy-cmeans algorithm supports clustering in n-dimensions (greater than zero!). Here
@@ -24,19 +24,19 @@ However, a factory function exists to avoid having to use :import.
 The below code from fuzzy-cmeans.test.core generates n random 2D data points via the
 factory method make-cluster-point:
 
-  (defn gen-cluster-points
-    [n xmin xmax ymin ymax]
-    (loop [m n ret (vector)]
-      (if (zero? m)
-        ret
-        (recur
-          (dec m)
-             (conj ret
-               (fuzzy/make-cluster-point
-                 (vector
-                   ( + (mod (rand Integer/MAX_VALUE) (inc (- xmax xmin))) xmin) ;x
-                   ( + (mod (rand Integer/MAX_VALUE) (inc (- ymax ymin))) ymin));y
-                 -1))))))
+    (defn gen-cluster-points
+      [n xmin xmax ymin ymax]
+      (loop [m n ret (vector)]
+        (if (zero? m)
+          ret
+          (recur
+            (dec m)
+              (conj ret
+                (fuzzy/make-cluster-point
+                  (vector
+                    ( + (mod (rand Integer/MAX_VALUE) (inc (- xmax xmin))) xmin) ;x
+                    ( + (mod (rand Integer/MAX_VALUE) (inc (- ymax ymin))) ymin));y
+                  -1))))))
 
 Below is an client implementation initializing and running fuzzy-cmeans: 
 
