@@ -65,10 +65,10 @@
 (defn main
   []
   (let [in-fuzzy 2.0
-        eps (Math/pow 10 -10) 
+        eps (Math/pow 10 -9) 
         xmin 1 xmax 500
         ymin 1 ymax 500
-        num-clusters 5
+        num-clusters 5 
         num-points 1000]
     (let [data-pts (gen-cluster-points num-points xmin xmax ymin ymax)
           centroids (gen-cluster-points num-clusters xmin xmax ymin ymax)]
@@ -124,12 +124,12 @@
   []
   (let [data (dump-points-for-incanter)
         center-data (dump-clusters-for-incanter)]
-    (let[ xs (map first data)
-          ys (map second data)
+    (let[ X (map first data)
+          Y (map second data)
           cs (map third data)
           center_xs (map first center-data)
           center_ys (map second center-data)]
-      (let [ plot (doto (scatter-plot xs ys :group-by cs)
+      (let [ plot (doto (scatter-plot X Y :group-by cs)
                         (add-points center_xs center_ys))]
         (view plot)))))
 

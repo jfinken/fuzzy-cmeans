@@ -31,12 +31,12 @@ factory method make-cluster-point:
           ret
           (recur
             (dec m)
-              (conj ret
-                (fuzzy/make-cluster-point
-                  (vector
-                    ( + (mod (rand Integer/MAX_VALUE) (inc (- xmax xmin))) xmin) ;x
-                    ( + (mod (rand Integer/MAX_VALUE) (inc (- ymax ymin))) ymin));y
-                  -1))))))
+            (conj ret
+              (fuzzy/make-cluster-point
+                (vector
+                  ( + (mod (rand Integer/MAX_VALUE) (inc (- xmax xmin))) xmin) ;x
+                  ( + (mod (rand Integer/MAX_VALUE) (inc (- ymax ymin))) ymin));y
+                -1))))))
 
 Below is an client implementation initializing and running fuzzy-cmeans: 
 
