@@ -65,11 +65,11 @@
 (defn main
   []
   (let [in-fuzzy 2.0
-        eps (Math/pow 10 -9) 
+        eps (Math/pow 10 -8) 
         xmin 1 xmax 500
         ymin 1 ymax 500
         num-clusters 5 
-        num-points 1000]
+        num-points 3000]
     (let [data-pts (gen-cluster-points num-points xmin xmax ymin ymax)
           centroids (gen-cluster-points num-clusters xmin xmax ymin ymax)]
       ; init fuzzy-cmeans
@@ -119,6 +119,10 @@
           (conj ret (:cluster-index (@data-points i)))))))
 )
 
+(defn get-scatter-title
+  [data]
+  (str "fuzzy c-means (" (count data) " data points)"))
+
 ; grab the data and visualize with a scatter-plot
 (defn incanter-vis
   []
@@ -129,7 +133,7 @@
           cs (map third data)
           center_xs (map first center-data)
           center_ys (map second center-data)]
-      (let [ plot (doto (scatter-plot X Y :group-by cs)
+      (let [ plot (doto (scatter-plot X Y :group-by cs :title (get-scatter-title data))
                         (add-points center_xs center_ys))]
         (view plot)))))
 
